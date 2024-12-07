@@ -9,8 +9,7 @@ let b:current_syntax = "baml"
 " Clear existing syntax definitions
 syntax clear
 
-" Use very magic mode for regex
-" We'll use `\v` for simpler patterns.
+" Use very magic mode for simpler regex
 " -----------------------------------------------------------------------
 " Keywords & Basic Types
 " -----------------------------------------------------------------------
@@ -31,28 +30,27 @@ syntax match bamlEnumName /\venum\s+\zs\k+/ containedin=ALL
 " -----------------------------------------------------------------------
 syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/ containedin=ALL
 syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
-
-" Optional and union type indicators
 syntax match bamlTypeOptional /\v\k+\?/ containedin=ALL
 syntax match bamlTypeUnion /\v\|/ containedin=ALL
-
-" Angle brackets for generics
 syntax match bamlAngleBracket /[<>]/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Comments & Docstrings
 " -----------------------------------------------------------------------
-" Docstrings: ///... 
+" Docstrings: ///...
 syntax match bamlDocstring /\v\/\/\/.*/ containedin=ALL
 
-" Normal comments: // but not ///
+" Normal comments: // (but not ///)
 syntax match bamlComment /\v\/\/[^/].*/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Strings (Normal & Multiline)
 " -----------------------------------------------------------------------
 syntax region bamlString start=+"+ skip=+\\."+ end=+"+ contained
-syntax region bamlMultilineString start=+#"+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString contained
+
+" For multiline strings starting with #"
+" and ending with "# we can write:
+syntax region bamlMultilineString start='#"' end='"#' contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString contained
 
 " -----------------------------------------------------------------------
 " Numbers
@@ -74,8 +72,6 @@ syntax match bamlEnvVar /\venv\.\k\+/ containedin=ALL
 " -----------------------------------------------------------------------
 syntax match bamlAttribute /\v\@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
 syntax match bamlBlockAttribute /\v\@\@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
-
-" General decorators
 syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 
 " -----------------------------------------------------------------------
@@ -84,22 +80,25 @@ syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 syntax match bamlJinjaVariableName /\v\<this\>/ contained
 syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
 
-syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction
-syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction
+" Jinja operator (e.g., `or`)
+syntax keyword bamlJinjaOperator or contained
+
+syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator
+syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator
 syntax region bamlJinjaComment start="{#" end="#}" keepend contained
 
-" Jinja delimiters defined individually to avoid complex escaping issues
-syntax match bamlJinjaDelim /\v\{\{/ contained
-syntax match bamlJinjaDelim /\v\}\}/ contained
-syntax match bamlJinjaDelim /\v\{\%/ contained
-syntax match bamlJinjaDelim /\v\%\}/ contained
-syntax match bamlJinjaDelim /\v\{\#/ contained
-syntax match bamlJinjaDelim /\v\#\}/ contained
+" Match Jinja delimiters separately for clarity
+syntax match bamlJinjaDelim /{{/ contained
+syntax match bamlJinjaDelim /}}/ contained
+syntax match bamlJinjaDelim /{%/ contained
+syntax match bamlJinjaDelim /%}/ contained
+syntax match bamlJinjaDelim /{#/ contained
+syntax match bamlJinjaDelim /#}/ contained
 
 " -----------------------------------------------------------------------
 " Context and Utility References
 " -----------------------------------------------------------------------
-syntax match bamlContext /\v\<ctx\.output_format\>/ containedin=ALL
+syntax match bamlContext /\vctx\.output_format/ containedin=ALL
 syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
 syntax match bamlUtility /\v\<_\>/ containedin=ALL
 
@@ -142,6 +141,7 @@ highlight link bamlJinjaBlock Special
 highlight link bamlJinjaComment Comment
 highlight link bamlJinjaVariableName Identifier
 highlight link bamlJinjaFunction Function
+highlight link bamlJinjaOperator Operator
 highlight link bamlJinjaDelim Special
 
 highlight link bamlContext Identifier
