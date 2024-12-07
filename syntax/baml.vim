@@ -6,14 +6,12 @@ if exists("b:current_syntax")
 endif
 let b:current_syntax = "baml"
 
-" Clear existing syntax definitions
 syntax clear
 
 " Use very magic mode for simpler regex
 " -----------------------------------------------------------------------
 " Keywords & Basic Types
 " -----------------------------------------------------------------------
-" Includes template_string, map, args, functions for clarity
 syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
 
 syntax keyword bamlPrimitiveTypes bool int float string null
@@ -32,7 +30,6 @@ syntax match bamlEnumName /\venum\s+\zs\k+/ containedin=ALL
 syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/ containedin=ALL
 syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
 
-" Optional and union type indicators
 syntax match bamlTypeOptional /\v\k+\?/ containedin=ALL
 syntax match bamlTypeUnion /\v\|/ containedin=ALL
 syntax match bamlAngleBracket /[<>]/ containedin=ALL
@@ -46,8 +43,12 @@ syntax match bamlComment /\v\/\/[^/].*/ containedin=ALL
 " -----------------------------------------------------------------------
 " Strings (Normal & Multiline)
 " -----------------------------------------------------------------------
-syntax region bamlString start=+"+ skip=+\\."+ end=+"+ contained
-syntax region bamlMultilineString start='#"' end='"#' contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString contained
+" Normal strings: Allow escaped quotes \" within
+syntax region bamlString start=+"+ skip=+\\\\\|\\\"+ end=+"+ containedin=ALL
+
+" Multiline strings (#" ... "#)
+syntax region bamlMultilineString start=+#"+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString containedin=ALL
+
 
 " -----------------------------------------------------------------------
 " Numbers
@@ -80,19 +81,22 @@ syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 " -----------------------------------------------------------------------
 " Jinja Syntax
 " -----------------------------------------------------------------------
-" Jinja variable/function names and operators
 syntax match bamlJinjaVariableName /\v\<this\>/ contained
 syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
 
-" Jinja logical operators and control keywords
-syntax keyword bamlJinjaOperator or and not contained
+" Jinja operators and keywords
+syntax keyword bamlJinjaOperator or and not in contained
 syntax keyword bamlJinjaControl if else elif for endfor endif contained
 
-syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl
-syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl
+" Highlight pipe `|` in Jinja filters
+syntax match bamlJinjaPipe /\v\|/ contained
+
+" Include strings inside Jinja, so `"Unknown"` etc. highlight properly
+syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
+syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
 syntax region bamlJinjaComment start="{#" end="#}" keepend contained
 
-" Jinja delimiters individually
+" Jinja delimiters
 syntax match bamlJinjaDelim /{{/ contained
 syntax match bamlJinjaDelim /}}/ contained
 syntax match bamlJinjaDelim /{%/ contained
@@ -106,8 +110,7 @@ syntax match bamlJinjaDelim /#}/ contained
 syntax match bamlContext /\vctx\.output_format/ containedin=ALL
 syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
 syntax match bamlUtility /\v\<_\>/ containedin=ALL
-" Highlight `_.role` as a utility function call indicator
-syntax match bamlUtilityFunction /\v_\.role/ containedin=ALL
+syntax match bamlUtilityFunction /\v_\.role\(/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Client/Provider Fields
@@ -157,6 +160,7 @@ highlight link bamlJinjaVariableName Identifier
 highlight link bamlJinjaFunction Function
 highlight link bamlJinjaOperator Operator
 highlight link bamlJinjaControl Conditional
+highlight link bamlJinjaPipe Operator
 highlight link bamlJinjaDelim Special
 
 highlight link bamlContext Identifier
