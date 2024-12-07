@@ -1,8 +1,6 @@
 " -----------------------------------------------------------------------
-" syntax/baml.vim
-" BAML syntax highlighting
+" syntax/baml.vim - Syntax file for BAML
 " -----------------------------------------------------------------------
-" Guard against multiple loads
 if exists("b:current_syntax")
   finish
 endif
@@ -11,64 +9,77 @@ let b:current_syntax = "baml"
 " Clear existing syntax definitions
 syntax clear
 
-" Use very magic mode (`\v`) consistently for clearer regex patterns
+" Use very magic mode for regex
+" We will use `\v` in all patterns to reduce escaping complexity.
+
 " -----------------------------------------------------------------------
 " Keywords & Basic Types
 " -----------------------------------------------------------------------
-" Define keywords (language constructs)
+" Primary keywords: class, function, enum, etc.
 syntax keyword bamlKeyword function class enum test generator retry_policy client prompt
 
-" Define primitive and multimodal types
+" Primitive and multimodal types
 syntax keyword bamlPrimitiveTypes bool int float string null
 syntax keyword bamlMultimodalTypes image audio model
 
 " -----------------------------------------------------------------------
 " Functions, Classes, Enums
 " -----------------------------------------------------------------------
-" Function names: first word after 'function'
-syntax match bamlFunctionName /\vfunction\s+\zs\k+/
+" Match function names
+syntax match bamlFunctionName /\vfunction\s+\zs\k+/ containedin=ALL
 
-" Class names: first word after 'class'
-syntax match bamlClassName /\vclass\s+\zs\k+/
+" Match class names
+syntax match bamlClassName /\vclass\s+\zs\k+/ containedin=ALL
 
-" Enum names: first word after 'enum'
-syntax match bamlEnumName /\venum\s+\zs\k+/
+" Match enum names
+syntax match bamlEnumName /\venum\s+\zs\k+/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Types & Return Types
 " -----------------------------------------------------------------------
-" Type annotation after a colon: arg: Type or arg: Type[]
-syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/
+" Type annotation after colon: arg: Type or arg: Type[]
+syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/ containedin=ALL
 
 " Return type after '->': -> Type or -> Type[]
-syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/
+syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
 
 " -----------------------------------------------------------------------
-" Comments & Strings
+" Comments
 " -----------------------------------------------------------------------
-" Single-line comments starting with //
-syntax match bamlComment /\v\/\/.*/ 
+" Single-line comments: // or /// (docstring)
+" Note: /// considered a docstring but we can treat it similarly
+syntax match bamlComment /\v\/\/\/?.*/ containedin=ALL
 
-" Strings inside double quotes
+" -----------------------------------------------------------------------
+" Strings
+" -----------------------------------------------------------------------
+" Normal strings: double quotes, with escape handling
+" Contained so they only show up where valid (e.g., not inside a comment)
 syntax region bamlString start=+"+ skip=+\\."+ end=+"+ contained
+
+" Multiline strings: #"...#" blocks
+syntax region bamlMultilineString start=+#"+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString contained
+
+" Template strings: identified by template_string or just treat as multiline
+" The existing multiline string rule will handle #"...#" forms.
 
 " -----------------------------------------------------------------------
 " Numbers
 " -----------------------------------------------------------------------
-" Highlight standalone numbers: 
-" Adjust as needed if numbers can appear without whitespace boundaries.
-syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/
+" Highlight standalone numbers
+" Adjust boundary if needed for your grammar
+syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/ containedin=ALL
 
 " -----------------------------------------------------------------------
-" Curly Braces Outside Jinja
+" Delimiters
 " -----------------------------------------------------------------------
-syntax match bamlCurlyBrace /[{}]/
+syntax match bamlCurlyBrace /[{}]/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Jinja Syntax
 " -----------------------------------------------------------------------
-" Marking contained Jinja syntax (variables, functions, etc.)
-" `contained` ensures these do not highlight outside intended regions.
+" Nested Jinja syntax often appears inside prompt strings.
+" We make Jinja items `contained` so they only highlight inside defined regions.
 
 syntax match bamlJinjaVariableName /\v\<this\>/ contained
 syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
@@ -78,19 +89,12 @@ syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=baml
 syntax region bamlJinjaComment start="{#" end="#}" keepend contained
 
 " -----------------------------------------------------------------------
-" Decorators
+" Decorators (like @check, @assert, @destripe, etc.)
 " -----------------------------------------------------------------------
-syntax match bamlDecorator /\v\@\k+/
-
-" -----------------------------------------------------------------------
-" Prompt Strings (e.g., prompt #""# blocks)
-" Can contain Jinja syntax and normal strings
-" Note: Add `containedin=ALL` if you want this block to appear anywhere.
-syntax region bamlPromptString start=+#""+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString
+syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Highlighting Links
-" Consider semantic groups: functions as `Function`, classes as `Type`, etc.
 " -----------------------------------------------------------------------
 highlight link bamlKeyword Keyword
 highlight link bamlPrimitiveTypes Type
@@ -101,6 +105,7 @@ highlight link bamlEnumName Type
 
 highlight link bamlComment Comment
 highlight link bamlString String
+highlight link bamlMultilineString String
 highlight link bamlNumber Number
 highlight link bamlCurlyBrace Delimiter
 
@@ -114,8 +119,6 @@ highlight link bamlDecorator PreProc
 
 highlight link bamlTypeAnnotation Type
 highlight link bamlReturnTypeAnnotation Type
-
-highlight link bamlPromptString String
 
 " -----------------------------------------------------------------------
 " End of baml.vim
