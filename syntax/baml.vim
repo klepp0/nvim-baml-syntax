@@ -1,84 +1,103 @@
+" -----------------------------------------------------------------------
 " syntax/baml.vim
+" BAML syntax highlighting
+" -----------------------------------------------------------------------
+" Guard against multiple loads
+if exists("b:current_syntax")
+  finish
+endif
+let b:current_syntax = "baml"
 
 " Clear existing syntax definitions
 syntax clear
 
-" -----------------------------
+" Use very magic mode (`\v`) consistently for clearer regex patterns
+" -----------------------------------------------------------------------
 " Keywords & Basic Types
-" -----------------------------
-" Define keywords (including function, class, etc.)
-syntax keyword bamlKeyword function class enum test generator retry_policy client prompt string int model image
+" -----------------------------------------------------------------------
+" Define keywords (language constructs)
+syntax keyword bamlKeyword function class enum test generator retry_policy client prompt
 
-" Define special built-in types as keywords as well (for simplicity)
-" Already included above: string, int, image, model, etc.
-" If you'd like them strictly as types, you can remove them from bamlKeyword and highlight via bamlTypeAnnotation below.
+" Define primitive and multimodal types
+syntax keyword bamlPrimitiveTypes bool int float string null
+syntax keyword bamlMultimodalTypes image audio model
 
-" -----------------------------
-" Classes & Functions
-" -----------------------------
-" Highlight the first word after 'class' as a class name
-syntax match bamlClassName /\vclass\s+\zs\k+/
-
-" Highlight the first word after 'function' as a function name
+" -----------------------------------------------------------------------
+" Functions, Classes, Enums
+" -----------------------------------------------------------------------
+" Function names: first word after 'function'
 syntax match bamlFunctionName /\vfunction\s+\zs\k+/
 
-" -----------------------------
-" Types & Returns
-" -----------------------------
-" Match a type annotation after a colon (e.g. arg: type or arg: type[])
+" Class names: first word after 'class'
+syntax match bamlClassName /\vclass\s+\zs\k+/
+
+" Enum names: first word after 'enum'
+syntax match bamlEnumName /\venum\s+\zs\k+/
+
+" -----------------------------------------------------------------------
+" Types & Return Types
+" -----------------------------------------------------------------------
+" Type annotation after a colon: arg: Type or arg: Type[]
 syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/
 
-" Match a return type after '->' (e.g. -> Type or -> Type[])
+" Return type after '->': -> Type or -> Type[]
 syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/
 
-" -----------------------------
+" -----------------------------------------------------------------------
 " Comments & Strings
-" -----------------------------
+" -----------------------------------------------------------------------
 " Single-line comments starting with //
-syntax match bamlComment "//.*$"
+syntax match bamlComment /\v\/\/.*/ 
 
 " Strings inside double quotes
-syntax region bamlString start=+"+ skip=+\\\\\|\\\"+ end=+"+
+syntax region bamlString start=+"+ skip=+\\."+ end=+"+ contained
 
-" -----------------------------
+" -----------------------------------------------------------------------
 " Numbers
-" -----------------------------
-" Highlight numbers only if surrounded by whitespace or line boundaries
-syntax match bamlNumber "\v(^|\s)\d+(\.\d+)?(\s|$)"
+" -----------------------------------------------------------------------
+" Highlight standalone numbers: 
+" Adjust as needed if numbers can appear without whitespace boundaries.
+syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/
 
-" -----------------------------
+" -----------------------------------------------------------------------
 " Curly Braces Outside Jinja
-" -----------------------------
-syntax match bamlCurlyBrace "[{}]"
+" -----------------------------------------------------------------------
+syntax match bamlCurlyBrace /[{}]/
 
-" -----------------------------
+" -----------------------------------------------------------------------
 " Jinja Syntax
-" -----------------------------
-" Jinja Variables: {{ ... }}
-syntax match bamlJinjaVariableName /\<this\>/ contained
-syntax match bamlJinjaFunction /\<contains\|length\>/ contained
+" -----------------------------------------------------------------------
+" Marking contained Jinja syntax (variables, functions, etc.)
+" `contained` ensures these do not highlight outside intended regions.
 
-syntax region bamlJinjaVariable start="{{" end="}}" keepend contains=bamlJinjaVariableName,bamlJinjaFunction
-syntax region bamlJinjaBlock start="{%" end="%}" keepend contains=bamlJinjaVariableName,bamlJinjaFunction
-syntax region bamlJinjaComment start="{#" end="#}" keepend
+syntax match bamlJinjaVariableName /\v\<this\>/ contained
+syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
 
-" -----------------------------
-" Decorators (e.g., @check, @assert)
-" -----------------------------
+syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction
+syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction
+syntax region bamlJinjaComment start="{#" end="#}" keepend contained
+
+" -----------------------------------------------------------------------
+" Decorators
+" -----------------------------------------------------------------------
 syntax match bamlDecorator /\v\@\k+/
 
-" -----------------------------
-" Prompt String (e.g., prompt #""# blocks)
-" -----------------------------
-" Assuming prompt blocks can contain Jinja syntax and normal strings
+" -----------------------------------------------------------------------
+" Prompt Strings (e.g., prompt #""# blocks)
+" Can contain Jinja syntax and normal strings
+" Note: Add `containedin=ALL` if you want this block to appear anywhere.
 syntax region bamlPromptString start=+#""+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString
 
-" -----------------------------
+" -----------------------------------------------------------------------
 " Highlighting Links
-" -----------------------------
+" Consider semantic groups: functions as `Function`, classes as `Type`, etc.
+" -----------------------------------------------------------------------
 highlight link bamlKeyword Keyword
+highlight link bamlPrimitiveTypes Type
+highlight link bamlMultimodalTypes Type
+highlight link bamlFunctionName Function
 highlight link bamlClassName Type
-highlight link bamlFunctionName Identifier
+highlight link bamlEnumName Type
 
 highlight link bamlComment Comment
 highlight link bamlString String
@@ -97,3 +116,7 @@ highlight link bamlTypeAnnotation Type
 highlight link bamlReturnTypeAnnotation Type
 
 highlight link bamlPromptString String
+
+" -----------------------------------------------------------------------
+" End of baml.vim
+" -----------------------------------------------------------------------
