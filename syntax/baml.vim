@@ -2,7 +2,7 @@
 syntax clear
 
 " 1) Keywords & Mappings (lowest priority)
-syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
+syntax keyword bamlKeyword function class enum test generator retry_policy template_string functions
 " If you have specific mappings or dictionary keys, define them here:
 " syntax match bamlKey /^\s*\k\+\s*:/ " Example of keys before strings
 highlight link bamlKeyword Keyword
