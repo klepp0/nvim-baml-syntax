@@ -123,7 +123,7 @@ syntax match bamlJinjaDelim /#}/
 syntax match bamlContext /ctx\.output_format/
 syntax match bamlUtility /\<ctx\>/
 syntax match bamlUtility /\<_\>/
-syntax match bamlUtilityFunction /_\.role\(/
+syntax match bamlUtilityFunction /_\.role(/
 
 " -----------------------------------------------------------------------
 " Client Fields
