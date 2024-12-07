@@ -65,7 +65,7 @@ syntax region bamlJinjaComment start="{#" end="#}" keepend
 " -----------------------------
 " Decorators (e.g., @check, @assert)
 " -----------------------------
-syntax match bamlDecorator /\v@\k+/
+syntax match bamlDecorator /\v\@\k+/
 
 " -----------------------------
 " Prompt String (e.g., prompt #""# blocks)
