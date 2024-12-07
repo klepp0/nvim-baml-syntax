@@ -1,0 +1,8 @@
+# Compiled Tree-sitter parser
+parser/*.so
+
+# Node modules (if using)
+node_modules/
+
+# Vim swap files
+*.swp
