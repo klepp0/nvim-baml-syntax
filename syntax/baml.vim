@@ -41,7 +41,7 @@ syntax match bamlJinjaDelim /#}/ contained
 
 " Add Jinja to string containers
 syntax clear bamlMultilineString
-syntax region bamlMultilineString start='#"' end='"#' contains=bamlString,bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlJinjaDelim,bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe
+syntax region bamlMultilineString start='#"' end='^\s*"#$' contains=bamlString,bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlJinjaDelim,bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe
 " Now Jinja overrides normal string highlighting inside multiline strings.
 
 " Highlight Jinja groups
