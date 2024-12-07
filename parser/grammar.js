@@ -30,6 +30,8 @@ module.exports = grammar({
         "function",
         field("name", $.identifier),
         field("parameters", $.parameter_list),
+        "->",
+        field("return_type", $.type),
         field("body", $.block),
       ),
 
@@ -75,6 +77,59 @@ module.exports = grammar({
 
     parameters: ($) => sepBy(",", $.identifier),
 
+    parameter: ($) => seq($.identifier, ":", $.type),
+
+    // Add this line to define union_type with higher precedence
+    union_type: ($) => prec.left(10, seq($.type, "|", $.type)),
+
+    // Modify the existing type rule to include union_type
+    type: ($) =>
+      choice(
+        $.primitive_type,
+        $.optional_type,
+        $.array_type,
+        $.generic_type,
+        $.union_type,
+      ),
+
+    primitive_type: ($) =>
+      choice(
+        "bool",
+        "int",
+        "float",
+        "string",
+        "null",
+        "image",
+        "audio",
+        "model",
+      ),
+
+    array_type: ($) => seq($.primitive_type, "[", "]"),
+
+    generic_type: ($) =>
+      seq($.identifier, "<", $.type, repeat(seq(",", $.type)), ">"),
+
+    // Blocks
+    block: ($) => seq("{", repeat(choice($.class_field, $.declaration)), "}"),
+
+    // Class Fields
+    class_field: ($) => seq($.identifier, $.type, repeat($.annotation)),
+
+    // Annotations
+    annotation: ($) => choice($.single_annotation, $.double_annotation),
+
+    single_annotation: ($) =>
+      seq("@", $.identifier, optional(seq("(", $.annotation_arguments, ")"))),
+
+    double_annotation: ($) =>
+      seq("@@", $.identifier, optional(seq("(", $.annotation_arguments, ")"))),
+
+    annotation_arguments: ($) => choice($.string, $.expression),
+
+    array_type: ($) => seq($.primitive_type, "[", "]"),
+
+    optional_type: ($) => seq($.primitive_type, "?"),
+
     // Blocks
     block: ($) => seq("{", repeat($._statement), "}"),
 
@@ -86,6 +141,50 @@ module.exports = grammar({
 
     // Comments (single-line)
     comment: ($) => /\/\/[^\n]*/,
+
+    // String Literals
+    string: ($) => /"([^"\\]|\\.)*"/,
+
+    // Expressions (Placeholder)
+    expression: ($) =>
+      choice(
+        $.environment_variable,
+        $.identifier,
+        $.number,
+        $.string,
+        $.object,
+        $.array,
+        $.map_literal,
+        $.prompt,
+        $.template_string,
+      ),
+    // Objects and Maps (Placeholder)
+    object: ($) => seq("{", repeat($.object_entry), "}"),
+
+    object_entry: ($) => seq($.identifier, ":", $.expression),
+
+    array: ($) => seq("[", optional($.array_elements), "]"),
+
+    array_elements: ($) => sepBy(",", $.expression),
+
+    map_literal: ($) => seq("{", repeat($.map_entry), "}"),
+
+    map_entry: ($) => seq($.identifier, ":", $.expression),
+
+    // Prompts with Jinja (Placeholder)
+    prompt: ($) => seq("prompt", $.jinja_string),
+
+    // Template Strings
+    template_string: ($) => /#\"([^"#\\]|\\.)*\"#/, // Matches #"...#"
+
+    // Jinja Strings (Placeholder)
+    jinja_string: ($) => /#\"([^"#\\]|\\.)*\"#/, // Reusing the same pattern
+
+    // Number Literals
+    number: ($) => /\d+/,
+
+    // Environment Variable (Placeholder)
+    environment_variable: ($) => seq("env.", $.identifier),
   },
 });
 
