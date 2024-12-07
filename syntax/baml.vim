@@ -10,11 +10,10 @@ let b:current_syntax = "baml"
 syntax clear
 
 " Use very magic mode for regex
-" We'll use `\v` in all patterns for simpler regex.
+" We'll use `\v` for simpler patterns.
 " -----------------------------------------------------------------------
 " Keywords & Basic Types
 " -----------------------------------------------------------------------
-" Add 'template_string', 'map', 'args', 'functions' to keywords for better highlighting
 syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
 
 syntax keyword bamlPrimitiveTypes bool int float string null
@@ -37,16 +36,17 @@ syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
 syntax match bamlTypeOptional /\v\k+\?/ containedin=ALL
 syntax match bamlTypeUnion /\v\|/ containedin=ALL
 
-" Angle brackets for generics (e.g., map<Type, OtherType>)
+" Angle brackets for generics
 syntax match bamlAngleBracket /[<>]/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Comments & Docstrings
 " -----------------------------------------------------------------------
-" // single-line comment
-" /// docstring-like comment
-syntax match bamlComment /\v\/\/(?!\/).*/ containedin=ALL
+" Docstrings: ///... 
 syntax match bamlDocstring /\v\/\/\/.*/ containedin=ALL
+
+" Normal comments: // but not ///
+syntax match bamlComment /\v\/\/[^/].*/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Strings (Normal & Multiline)
@@ -72,12 +72,10 @@ syntax match bamlEnvVar /\venv\.\k\+/ containedin=ALL
 " -----------------------------------------------------------------------
 " Attributes & Decorators
 " -----------------------------------------------------------------------
-" Single @attributes and double @@attributes
 syntax match bamlAttribute /\v\@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
 syntax match bamlBlockAttribute /\v\@\@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
 
-" Decorators (general @keyword)
-" Keep general decorators for other cases not listed above
+" General decorators
 syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 
 " -----------------------------------------------------------------------
@@ -90,14 +88,20 @@ syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=b
 syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction
 syntax region bamlJinjaComment start="{#" end="#}" keepend contained
 
-" Jinja delimiters highlighted separately
-syntax match bamlJinjaDelim /\v(\{\{|}}|{%|%}|{#|#})/ contained
+" Jinja delimiters defined individually to avoid complex escaping issues
+syntax match bamlJinjaDelim /\v\{\{/ contained
+syntax match bamlJinjaDelim /\v\}\}/ contained
+syntax match bamlJinjaDelim /\v\{\%/ contained
+syntax match bamlJinjaDelim /\v\%\}/ contained
+syntax match bamlJinjaDelim /\v\{\#/ contained
+syntax match bamlJinjaDelim /\v\#\}/ contained
 
 " -----------------------------------------------------------------------
 " Context and Utility References
 " -----------------------------------------------------------------------
-syntax match bamlContext /\vctx\.output_format/ containedin=ALL
-syntax match bamlUtility /\v\_<ctx\>|\_<_\>/ containedin=ALL
+syntax match bamlContext /\v\<ctx\.output_format\>/ containedin=ALL
+syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
+syntax match bamlUtility /\v\<_\>/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Client/Provider Fields
