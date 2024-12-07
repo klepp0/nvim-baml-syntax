@@ -106,8 +106,8 @@ syntax match bamlJinjaDelim /#}/ contained
 syntax match bamlContext /\vctx\.output_format/ containedin=ALL
 syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
 syntax match bamlUtility /\v\<_\>/ containedin=ALL
-" If you'd like to highlight _.role(...) as a function call:
-syntax match bamlUtilityFunction /\v\_<_\.(role)\>/ containedin=ALL
+" Highlight `_.role` as a utility function call indicator
+syntax match bamlUtilityFunction /\v_\.role/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Client/Provider Fields
