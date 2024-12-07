@@ -13,6 +13,7 @@ syntax clear
 " -----------------------------------------------------------------------
 " Keywords & Basic Types
 " -----------------------------------------------------------------------
+" Includes template_string, map, args, functions for clarity
 syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
 
 syntax keyword bamlPrimitiveTypes bool int float string null
@@ -30,6 +31,8 @@ syntax match bamlEnumName /\venum\s+\zs\k+/ containedin=ALL
 " -----------------------------------------------------------------------
 syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/ containedin=ALL
 syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
+
+" Optional and union type indicators
 syntax match bamlTypeOptional /\v\k+\?/ containedin=ALL
 syntax match bamlTypeUnion /\v\|/ containedin=ALL
 syntax match bamlAngleBracket /[<>]/ containedin=ALL
@@ -37,19 +40,13 @@ syntax match bamlAngleBracket /[<>]/ containedin=ALL
 " -----------------------------------------------------------------------
 " Comments & Docstrings
 " -----------------------------------------------------------------------
-" Docstrings: ///...
 syntax match bamlDocstring /\v\/\/\/.*/ containedin=ALL
-
-" Normal comments: // (but not ///)
 syntax match bamlComment /\v\/\/[^/].*/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Strings (Normal & Multiline)
 " -----------------------------------------------------------------------
 syntax region bamlString start=+"+ skip=+\\."+ end=+"+ contained
-
-" For multiline strings starting with #"
-" and ending with "# we can write:
 syntax region bamlMultilineString start='#"' end='"#' contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString contained
 
 " -----------------------------------------------------------------------
@@ -58,9 +55,15 @@ syntax region bamlMultilineString start='#"' end='"#' contains=bamlJinjaVariable
 syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/ containedin=ALL
 
 " -----------------------------------------------------------------------
-" Delimiters
+" Delimiters & Operators
 " -----------------------------------------------------------------------
 syntax match bamlCurlyBrace /[{}]/ containedin=ALL
+syntax match bamlParen /[()]/ containedin=ALL
+syntax match bamlBracket /[\[\]]/ containedin=ALL
+syntax match bamlComma /,/ containedin=ALL
+syntax match bamlColon /:/ containedin=ALL
+syntax match bamlEqual /=/ containedin=ALL
+syntax match bamlArrow /->/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Environment Variables
@@ -77,17 +80,19 @@ syntax match bamlDecorator /\v\@\k+/ containedin=ALL
 " -----------------------------------------------------------------------
 " Jinja Syntax
 " -----------------------------------------------------------------------
+" Jinja variable/function names and operators
 syntax match bamlJinjaVariableName /\v\<this\>/ contained
 syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
 
-" Jinja operator (e.g., `or`)
-syntax keyword bamlJinjaOperator or contained
+" Jinja logical operators and control keywords
+syntax keyword bamlJinjaOperator or and not contained
+syntax keyword bamlJinjaControl if else elif for endfor endif contained
 
-syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator
-syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator
+syntax region bamlJinjaVariable start="{{" end="}}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl
+syntax region bamlJinjaBlock start="{%" end="%}" keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl
 syntax region bamlJinjaComment start="{#" end="#}" keepend contained
 
-" Match Jinja delimiters separately for clarity
+" Jinja delimiters individually
 syntax match bamlJinjaDelim /{{/ contained
 syntax match bamlJinjaDelim /}}/ contained
 syntax match bamlJinjaDelim /{%/ contained
@@ -101,6 +106,8 @@ syntax match bamlJinjaDelim /#}/ contained
 syntax match bamlContext /\vctx\.output_format/ containedin=ALL
 syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
 syntax match bamlUtility /\v\<_\>/ containedin=ALL
+" If you'd like to highlight _.role(...) as a function call:
+syntax match bamlUtilityFunction /\v\_<_\.(role)\>/ containedin=ALL
 
 " -----------------------------------------------------------------------
 " Client/Provider Fields
@@ -122,7 +129,14 @@ highlight link bamlDocstring SpecialComment
 highlight link bamlString String
 highlight link bamlMultilineString String
 highlight link bamlNumber Number
+
 highlight link bamlCurlyBrace Delimiter
+highlight link bamlParen Delimiter
+highlight link bamlBracket Delimiter
+highlight link bamlComma Delimiter
+highlight link bamlColon Operator
+highlight link bamlEqual Operator
+highlight link bamlArrow Operator
 
 highlight link bamlEnvVar Constant
 
@@ -142,10 +156,12 @@ highlight link bamlJinjaComment Comment
 highlight link bamlJinjaVariableName Identifier
 highlight link bamlJinjaFunction Function
 highlight link bamlJinjaOperator Operator
+highlight link bamlJinjaControl Conditional
 highlight link bamlJinjaDelim Special
 
 highlight link bamlContext Identifier
 highlight link bamlUtility Special
+highlight link bamlUtilityFunction Function
 
 highlight link bamlClientField Identifier
 
