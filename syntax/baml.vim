@@ -1,5 +1,5 @@
 " -----------------------------------------------------------------------
-" syntax/baml.vim - Revised Syntax File for BAML
+" syntax/baml.vim - Refined Syntax Highlighting for BAML
 " -----------------------------------------------------------------------
 if exists("b:current_syntax")
   finish
@@ -8,133 +8,130 @@ let b:current_syntax = "baml"
 
 syntax clear
 
-" Very magic mode
-" -----------------------------------------------------------------------
-" Keywords
-" Add `class` and `client` to bamlKeyword for consistent keyword highlighting.
-syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
-
-syntax keyword bamlPrimitiveTypes bool int float string null
-syntax keyword bamlMultimodalTypes image audio model
+" Use very magic mode by default in patterns if needed
+" We keep most patterns simple.
 
 " -----------------------------------------------------------------------
 " Comments & Docstrings
 " -----------------------------------------------------------------------
-" Docstring: start with `///`
+" Priority: Comments & docstrings should override other syntax.
+" Docstrings
 syntax match bamlDocstring /^\/\/\/.*/ 
-" Normal comment: `//`
-syntax match bamlComment '^//.*'
+" Normal single-line comments
+syntax match bamlComment /^\/\/[^/].*/
 
-" No containedin=ALL here, so these matches take precedence over others inside the line.
+" No containedin=ALL here for comments. Once matched, no other highlighting inside them.
+
+" -----------------------------------------------------------------------
+" Keywords & Basic Types
+" -----------------------------------------------------------------------
+" Add class, enum, function, template_string, client as language keywords
+syntax keyword bamlKeyword function class enum test generator retry_policy client prompt template_string map args functions
+
+" Primitive & Multimodal Types
+syntax keyword bamlPrimitiveTypes bool int float string null
+syntax keyword bamlMultimodalTypes image audio model
 
 " -----------------------------------------------------------------------
 " Classes, Functions, Enums, Template Strings
 " -----------------------------------------------------------------------
-" Match class names
-syntax match bamlClassName /\vclass\s+\zs\k+/ containedin=ALL
+" Match class, function, enum, and template_string names:
+syntax match bamlClassName /\vclass\s+\zs\k+/
+syntax match bamlFunctionName /\vfunction\s+\zs\k+/
+syntax match bamlEnumName /\venum\s+\zs\k+/
+syntax match bamlTemplateStringName /\vtemplate_string\s+\zs\k+/
 
-" Match function names
-syntax match bamlFunctionName /\vfunction\s+\zs\k+/ containedin=ALL
-
-" Match enum names
-syntax match bamlEnumName /\venum\s+\zs\k+/ containedin=ALL
-
-" Match template_string names
-syntax match bamlTemplateStringName /\vtemplate_string\s+\zs\k+/ containedin=ALL
-
-" Highlight user-defined types (like Person) as Type: capitalized words
-syntax match bamlUserType /\v\<[A-Z][A-Za-z0-9_]*\>/ containedin=ALL
+" User-defined types: Capitalized words
+syntax match bamlUserType /\<[A-Z][A-Za-z0-9_]*\>/
 
 " -----------------------------------------------------------------------
 " Types & Return Types
 " -----------------------------------------------------------------------
-syntax match bamlTypeAnnotation /\v:\s*\k+(\[\])?/ containedin=ALL
-syntax match bamlReturnTypeAnnotation /\v->\s*\k+(\[\])?/ containedin=ALL
-syntax match bamlTypeOptional /\v\k+\?/ containedin=ALL
-syntax match bamlTypeUnion /\v\|/ containedin=ALL
-syntax match bamlAngleBracket /[<>]/ containedin=ALL
+syntax match bamlTypeAnnotation /:\s*\k+(\[\])?/
+syntax match bamlReturnTypeAnnotation /->\s*\k+(\[\])?/
+
+syntax match bamlTypeOptional /\k+\?/
+syntax match bamlTypeUnion /\|/
+syntax match bamlAngleBracket /[<>]/
 
 " -----------------------------------------------------------------------
 " Strings (Normal & Multiline)
 " -----------------------------------------------------------------------
-" Normal strings
-syntax region bamlString start=+"+ skip=+\\\\\|\\\"+ end=+"+ containedin=ALL
+" Normal strings - highlight everything between double quotes
+syntax region bamlString start='"' skip='\\."' end='"'
 
 " Multiline strings (#" ... "#)
-syntax region bamlMultilineString start=+#"+ end=+"#"+ contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString containedin=ALL
+syntax region bamlMultilineString start='#"' end='"#' contains=bamlJinjaVariable,bamlJinjaBlock,bamlJinjaComment,bamlString
 
 " -----------------------------------------------------------------------
 " Numbers
 " -----------------------------------------------------------------------
-syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/ containedin=ALL
+syntax match bamlNumber /\v(^|\s)\d+(\.\d+)?(\s|$)/
 
 " -----------------------------------------------------------------------
 " Delimiters & Operators
 " -----------------------------------------------------------------------
-syntax match bamlCurlyBrace /[{}]/ containedin=ALL
-syntax match bamlParen /[()]/ containedin=ALL
-syntax match bamlBracket /[\[\]]/ containedin=ALL
-syntax match bamlComma /,/ containedin=ALL
-syntax match bamlColon /:/ containedin=ALL
-syntax match bamlEqual /=/ containedin=ALL
-syntax match bamlArrow /->/ containedin=ALL
+syntax match bamlCurlyBrace /[{}]/
+syntax match bamlParen /[()]/
+syntax match bamlBracket /[\[\]]/
+syntax match bamlComma /,/
+syntax match bamlColon /:/
+syntax match bamlEqual /=/
+syntax match bamlArrow /->/
 
 " -----------------------------------------------------------------------
 " Environment Variables
 " -----------------------------------------------------------------------
-" Escape the dot to match literally.
-syntax match bamlEnvVar /\venv\.\k\+/ containedin=ALL
+syntax match bamlEnvVar /env\.\k\+/
 
 " -----------------------------------------------------------------------
 " Attributes & Decorators
 " -----------------------------------------------------------------------
 " @@ attributes
-syntax match bamlBlockAttribute /@@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
-
+syntax match bamlBlockAttribute /@@\(alias\|description\|assert\|check\|dynamic\|skip\)\>/
 " Single @ attributes
-syntax match bamlAttribute /\v\@(alias|description|assert|check|dynamic|skip)\>/ containedin=ALL
-syntax match bamlDecorator /\v\@\k+/ containedin=ALL
+syntax match bamlAttribute /@(alias|description|assert|check|dynamic|skip)\>/
+syntax match bamlDecorator /@\k+/
 
 " -----------------------------------------------------------------------
 " Jinja Syntax
 " -----------------------------------------------------------------------
-syntax match bamlJinjaVariableName /\v\<this\>/ contained
-syntax match bamlJinjaFunction /\v<(contains|length)>/ contained
+syntax match bamlJinjaVariableName /\<this\>/
+syntax match bamlJinjaFunction /<(contains|length)>/
 
 " Jinja operators and keywords
-syntax keyword bamlJinjaOperator or and not in contained
-syntax keyword bamlJinjaControl if else elif for endfor endif contained
+syntax keyword bamlJinjaOperator or and not in
+syntax keyword bamlJinjaControl if else elif for endfor endif
 
-" Highlight pipe `|` in Jinja filters
-syntax match bamlJinjaPipe /\v\|/ contained
+" Jinja pipe for filters
+syntax match bamlJinjaPipe /\|/
 
-syntax region bamlJinjaVariable start='{{' end='}}' keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
-syntax region bamlJinjaBlock start='{%' end='%}' keepend contained contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
-syntax region bamlJinjaComment start='{#' end='#}' keepend contained
+syntax region bamlJinjaVariable start='{{' end='}}' keepend contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
+syntax region bamlJinjaBlock start='{%' end='%}' keepend contains=bamlJinjaVariableName,bamlJinjaFunction,bamlJinjaOperator,bamlJinjaControl,bamlJinjaPipe,bamlString
+syntax region bamlJinjaComment start='{#' end='#}' keepend
 
-syntax match bamlJinjaDelim /{{/ contained
-syntax match bamlJinjaDelim /}}/ contained
-syntax match bamlJinjaDelim /{%/ contained
-syntax match bamlJinjaDelim /%}/ contained
-syntax match bamlJinjaDelim /{#/ contained
-syntax match bamlJinjaDelim /#}/ contained
+syntax match bamlJinjaDelim /{{/
+syntax match bamlJinjaDelim /}}/
+syntax match bamlJinjaDelim /{%/
+syntax match bamlJinjaDelim /%}/
+syntax match bamlJinjaDelim /{#/
+syntax match bamlJinjaDelim /#}/
 
 " -----------------------------------------------------------------------
 " Context and Utility References
 " -----------------------------------------------------------------------
-syntax match bamlContext /\vctx\.output_format/ containedin=ALL
-syntax match bamlUtility /\v\<ctx\>/ containedin=ALL
-syntax match bamlUtility /\v\<_\>/ containedin=ALL
-syntax match bamlUtilityFunction /\v_\.role\(/ containedin=ALL
+syntax match bamlContext /ctx\.output_format/
+syntax match bamlUtility /\<ctx\>/
+syntax match bamlUtility /\<_\>/
+syntax match bamlUtilityFunction /_\.role\(/
 
 " -----------------------------------------------------------------------
-" Client/Provider Fields
+" Client Fields
 " -----------------------------------------------------------------------
-" We'll define a region for client<llm> blocks to limit bamlClientField to that context.
-syntax region bamlClientSpec start='client<llm>' end='{'me=s-1 containedin=ALL contained keepend contains=bamlClientField
-syntax region bamlClientBody start='{' end='}' containedin=bamlClientSpec,bamlClientBody contains=bamlClientField
-" Now client fields highlight only inside client specs.
-syntax keyword bamlClientField provider options model api_key contained
+" If you only want these highlighted within a `client<llm>` block, you can define
+" a region for client blocks. But if this caused issues, you might omit it.
+" For now, highlight these globally as they might cause confusion otherwise.
+syntax keyword bamlClientField provider options model api_key
 
 " -----------------------------------------------------------------------
 " Highlighting Links
