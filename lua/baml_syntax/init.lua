@@ -3,7 +3,7 @@
 require 'nvim-treesitter.parsers'.get_parser_configs().baml = {
     install_info = {
         url = "https://github.com/klepp0/nvim-baml-syntax",
-        files = { "src/parser.c" },
+        files = { "parser/src/parser.c" },
     },
     filetype = "baml",
 }
