@@ -10,7 +10,7 @@ highlight link bamlKeyword Keyword
 
 " 2) Strings (second priority)
 " Normal strings
-syntax region bamlString start='"' skip='\\."' end='"'
+syntax region bamlString start='"' skip='\\\"' end='"'
 highlight link bamlString String
 
 " Multiline strings (#" ... "#)
