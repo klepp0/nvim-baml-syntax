@@ -3,14 +3,23 @@ module.exports = grammar({
   name: "baml",
 
   // Define extra tokens to ignore (whitespace and comments)
-  extras: ($) => [/\s/, $.comment],
+  extras: ($) => [/\s/, $.docstring, $.comment],
 
   // Define the root node
   rules: {
     source_file: ($) => repeat($._statement),
 
     // Generic statement can be a declaration
-    _statement: ($) => choice($.declaration),
+    _statement: ($) => choice($.declaration, $.expression),
+
+    // Defining helper rules
+    _space: ($) => /\s+/,
+    _text: ($) => /[^{}]+/,
+    _break: ($) => /\n/,
+
+    // Comments
+    docstring: ($) => /\/\/\/[^\n]*/,
+    comment: ($) => /\/\/[^\n]*/,
 
     // Declarations
     declaration: ($) =>
@@ -30,9 +39,31 @@ module.exports = grammar({
         "function",
         field("name", $.identifier),
         field("parameters", $.parameter_list),
-        "->",
+        field("arrow", $._arrow),
         field("return_type", $.type),
-        field("body", $.block),
+        field("body", $.function_body),
+      ),
+    _arrow: ($) => token("->"),
+
+    parameter_list: ($) => seq("(", optional(sepBy1($.parameter, ",")), ")"),
+
+    function_body: ($) => seq("{", repeat($._function_statement), "}"),
+    _function_statement: ($) => choice($.prompt, $.llm),
+
+    llm: ($) =>
+      seq(
+        "client",
+        $._space,
+        field("llm_spec", choice($.identifier, $.string)),
+        optional($._break),
+      ),
+
+    prompt: ($) =>
+      seq(
+        "prompt",
+        $._space,
+        field("llm_spec", choice($.identifier, $.string, $.block_string)),
+        optional($._break),
       ),
 
     // Class Declaration
@@ -69,13 +100,14 @@ module.exports = grammar({
       seq(
         "template_string",
         field("name", $.identifier),
-        field("content", $.template_string),
+        field("parameters", $.parameter_list),
+        field("content", $.block_string),
       ),
 
     // Parameter List (simple, no types)
     parameter_list: ($) => seq("(", optional($.parameters), ")"),
 
-    parameters: ($) => sepBy(",", $.identifier),
+    parameters: ($) => sepBy(",", $.parameter),
 
     parameter: ($) => seq($.identifier, ":", $.type),
 
@@ -84,66 +116,24 @@ module.exports = grammar({
 
     // Modify the existing type rule to include union_type
     type: ($) =>
-      choice(
-        $.primitive_type,
-        $.optional_type,
-        $.array_type,
-        $.generic_type,
-        $.union_type,
-      ),
+      choice($.primitive_type, $.array_type, $.identifier, $.union_type),
 
     primitive_type: ($) =>
-      choice(
-        "bool",
-        "int",
-        "float",
-        "string",
-        "null",
-        "image",
-        "audio",
-        "model",
-      ),
+      choice("bool", "int", "float", "string", "null", "image", "audio"),
 
-    array_type: ($) => seq($.primitive_type, "[", "]"),
+    array_type: ($) => seq(choice($.primitive_type, $.identifier), "[", "]"),
 
-    generic_type: ($) =>
-      seq($.identifier, "<", $.type, repeat(seq(",", $.type)), ">"),
-
-    // Blocks
-    block: ($) => seq("{", repeat(choice($.class_field, $.declaration)), "}"),
-
-    // Class Fields
-    class_field: ($) => seq($.identifier, $.type, repeat($.annotation)),
-
-    // Annotations
-    annotation: ($) => choice($.single_annotation, $.double_annotation),
-
-    single_annotation: ($) =>
-      seq("@", $.identifier, optional(seq("(", $.annotation_arguments, ")"))),
-
-    double_annotation: ($) =>
-      seq("@@", $.identifier, optional(seq("(", $.annotation_arguments, ")"))),
-
-    annotation_arguments: ($) => choice($.string, $.expression),
-
-    array_type: ($) => seq($.primitive_type, "[", "]"),
-
-    optional_type: ($) => seq($.primitive_type, "?"),
-
-    // Blocks
-    block: ($) => seq("{", repeat($._statement), "}"),
-
-    // Template Strings (simple multiline strings)
-    template_string: ($) => /#\"([^"#\\]|\\.)*\"#/, // Matches #"...#"
+    // Multiline string
+    block_string: ($) => seq('#"', $._text, '"#'),
 
     // Identifiers
     identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
-    // Comments (single-line)
-    comment: ($) => /\/\/[^\n]*/,
-
     // String Literals
     string: ($) => /"([^"\\]|\\.)*"/,
+
+    // Environment Variable (Placeholder)
+    environment_variable: ($) => seq("env.", field("name", $.identifier)),
 
     // Expressions (Placeholder)
     expression: ($) =>
@@ -152,29 +142,22 @@ module.exports = grammar({
         $.identifier,
         $.number,
         $.string,
-        $.object,
         $.array,
         $.map_literal,
-        $.prompt,
-        $.template_string,
-        $.curly_expression,
+        $.block_string,
       ),
 
-    // Objects and Maps (Placeholder)
-    object: ($) => seq("{", repeat($.object_entry), "}"),
-
-    object_entry: ($) => seq($.identifier, ":", $.expression),
+    block: ($) => seq("{", repeat($._statement), "}"),
 
     array: ($) => seq("[", optional($.array_elements), "]"),
 
     array_elements: ($) => sepBy(",", $.expression),
 
-    map_literal: ($) => seq("{", repeat($.map_entry), "}"),
+    map_literal: ($) => seq("{", repeat($.map_entries), "}"),
 
-    map_entry: ($) => seq($.identifier, ":", $.expression),
+    map_entry: ($) => seq($.identifier, $._space, $.expression),
 
-    // Prompts with Jinja (Placeholder)
-    prompt: ($) => seq("prompt", $.jinja_string),
+    map_entries: ($) => sepBy(",", $.map_entry),
 
     // Template Strings
     template_string: ($) => /#\"([^"#\\]|\\.)*\"#/, // Matches #"...#"
@@ -184,9 +167,6 @@ module.exports = grammar({
 
     // Number Literals
     number: ($) => /\d+/,
-
-    // Environment Variable (Placeholder)
-    environment_variable: ($) => seq("env", ".", $.identifier),
 
     curly_expression: ($) => seq("{{", $.expression, "}}"),
   },
