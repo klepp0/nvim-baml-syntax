@@ -823,7 +823,11 @@
       "members": [
         {
           "type": "STRING",
-          "value": "env."
+          "value": "env"
+        },
+        {
+          "type": "STRING",
+          "value": "."
         },
         {
           "type": "SYMBOL",
