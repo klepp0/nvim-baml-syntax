@@ -4,6 +4,7 @@ parser_config.baml = {
     install_info = {
         url = "https://github.com/klepp0/nvim-baml-syntax",
         files = { "parser/baml.so" },
+        branch = "main",
         generate_requires_npm = false,
         requires_generate_from_grammar = false,
     },
