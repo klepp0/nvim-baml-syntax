@@ -28,7 +28,7 @@ module.exports = grammar({
         $.class_declaration,
         $.enum_declaration,
         $.test_declaration,
-        $.generator_declaration,
+        $.client_declaration,
         $.retry_policy_declaration,
         $.template_string_declaration,
       ),
@@ -74,18 +74,13 @@ module.exports = grammar({
     enum_declaration: ($) =>
       seq("enum", field("name", $.identifier), field("body", $.block)),
 
+    // Client Declaration
+    client_declaration: ($) =>
+      seq("client<llm>", field("name", $.identifier), field("body", $.block)),
+
     // Test Declaration
     test_declaration: ($) =>
       seq("test", field("name", $.identifier), field("body", $.block)),
-
-    // Generator Declaration
-    generator_declaration: ($) =>
-      seq(
-        "generator",
-        field("name", $.identifier),
-        field("parameters", $.parameter_list),
-        field("body", $.block),
-      ),
 
     // Retry Policy Declaration
     retry_policy_declaration: ($) =>

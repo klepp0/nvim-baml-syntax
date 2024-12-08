@@ -62,7 +62,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "generator_declaration"
+          "name": "client_declaration"
         },
         {
           "type": "SYMBOL",
@@ -326,12 +326,12 @@
         }
       ]
     },
-    "test_declaration": {
+    "client_declaration": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "test"
+          "value": "client<llm>"
         },
         {
           "type": "FIELD",
@@ -351,12 +351,12 @@
         }
       ]
     },
-    "generator_declaration": {
+    "test_declaration": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "generator"
+          "value": "test"
         },
         {
           "type": "FIELD",
@@ -364,14 +364,6 @@
           "content": {
             "type": "SYMBOL",
             "name": "identifier"
-          }
-        },
-        {
-          "type": "FIELD",
-          "name": "parameters",
-          "content": {
-            "type": "SYMBOL",
-            "name": "parameter_list"
           }
         },
         {

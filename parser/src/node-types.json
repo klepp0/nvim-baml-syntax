@@ -99,6 +99,32 @@
     }
   },
   {
+    "type": "client_declaration",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "declaration",
     "named": true,
     "fields": {},
@@ -111,15 +137,15 @@
           "named": true
         },
         {
+          "type": "client_declaration",
+          "named": true
+        },
+        {
           "type": "enum_declaration",
           "named": true
         },
         {
           "type": "function_declaration",
-          "named": true
-        },
-        {
-          "type": "generator_declaration",
           "named": true
         },
         {
@@ -287,42 +313,6 @@
         "types": [
           {
             "type": "type",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "generator_declaration",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "parameters": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "parameter_list",
             "named": true
           }
         ]
@@ -678,6 +668,10 @@
     "named": false
   },
   {
+    "type": "client<llm>",
+    "named": false
+  },
+  {
     "type": "comment",
     "named": true
   },
@@ -699,10 +693,6 @@
   },
   {
     "type": "function",
-    "named": false
-  },
-  {
-    "type": "generator",
     "named": false
   },
   {
