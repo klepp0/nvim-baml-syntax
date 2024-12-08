@@ -23,3 +23,18 @@ highlight link bamlComment Comment
 " Docstrings
 syntax match bamlDocstring /^\/\/\/.*/
 highlight link bamlDocstring SpecialComment
+
+highlight! link @comment Comment
+highlight! link @keyword Keyword
+highlight! link @function Function
+highlight! link @type Type
+highlight! link @parameter Identifier
+highlight! link @string String
+highlight! link @number Number
+highlight! link @operator Operator
+highlight! link @variable.builtin Identifier
+highlight! link @identifier Identifier
+highlight! link @structure Structure
+highlight! link @constant.builtin Constant
+highlight! link @property Property
+highlight! link @block Block
