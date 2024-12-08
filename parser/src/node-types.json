@@ -124,6 +124,21 @@
     }
   },
   {
+    "type": "curly_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "declaration",
     "named": true,
     "fields": {},
@@ -232,6 +247,10 @@
       "types": [
         {
           "type": "array",
+          "named": true
+        },
+        {
+          "type": "curly_expression",
           "named": true
         },
         {
@@ -808,11 +827,19 @@
     "named": false
   },
   {
+    "type": "{{",
+    "named": false
+  },
+  {
     "type": "|",
     "named": false
   },
   {
     "type": "}",
+    "named": false
+  },
+  {
+    "type": "}}",
     "named": false
   }
 ]

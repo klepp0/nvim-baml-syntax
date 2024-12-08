@@ -666,6 +666,10 @@
         {
           "type": "SYMBOL",
           "name": "template_string"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "curly_expression"
         }
       ]
     },
@@ -824,6 +828,23 @@
         {
           "type": "SYMBOL",
           "name": "identifier"
+        }
+      ]
+    },
+    "curly_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{{"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "expression"
+        },
+        {
+          "type": "STRING",
+          "value": "}}"
         }
       ]
     }

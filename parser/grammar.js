@@ -157,6 +157,7 @@ module.exports = grammar({
         $.map_literal,
         $.prompt,
         $.template_string,
+        $.curly_expression,
       ),
     // Objects and Maps (Placeholder)
     object: ($) => seq("{", repeat($.object_entry), "}"),
@@ -185,6 +186,8 @@ module.exports = grammar({
 
     // Environment Variable (Placeholder)
     environment_variable: ($) => seq("env.", $.identifier),
+
+    curly_expression: ($) => seq("{{", $.expression, "}}"),
   },
 });
 
