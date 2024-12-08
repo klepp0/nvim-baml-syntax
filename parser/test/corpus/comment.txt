@@ -1,0 +1,39 @@
+======================
+Comment
+======================
+
+// hello there!
+foo // this is a trailing comment
+
+---
+
+(source_file
+    (comment)
+    (expression
+        (identifier))
+    (comment))
+
+
+======================
+Docstring
+======================
+
+/// This is a docstring for a class
+class Foo {
+    /// This is a docstring for a property
+    property1 string
+}
+
+---
+
+(source_file
+  (docstring)
+  (declaration
+    (class_declaration
+      (identifier)
+      (block
+        (docstring)
+        (expression
+          (identifier))
+        (expression
+          (identifier))))))

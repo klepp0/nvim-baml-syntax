@@ -1,0 +1,15 @@
+======================
+Environment Variables
+======================
+
+// Environment variable usage
+env.MY_SECRET_KEY
+
+---
+
+(source_file
+    (comment)
+    (expression
+        (environment_variable
+            (identifier))))
+

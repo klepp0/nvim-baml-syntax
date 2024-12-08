@@ -1,0 +1,71 @@
+=====================
+Simple Dictionary
+=====================
+
+{
+  key1 "string",
+  key2 123,
+  key3 true,
+  key3 variable
+}
+
+---
+
+(source_file
+  (expression
+    (map_literal
+      (map_entries
+        (map_entry
+          (identifier)
+          (expression
+            (string)))
+        (map_entry
+          (identifier)
+          (expression
+            (number)))
+        (map_entry
+          (identifier)
+          (expression
+            (identifier)))
+        (map_entry
+          (identifier)
+          (expression
+            (identifier)))))))
+
+
+======================
+Nested Dictionary
+======================
+
+{
+  key1 value1,
+  key2 {
+    nestedKey1 nestedValue1,
+    nestedKey2 nestedValue2
+  }
+}
+
+---
+
+(source_file
+  (expression
+    (map_literal
+      (map_entries
+        (map_entry
+          (identifier)
+          (expression
+            (identifier)))
+        (map_entry
+          (identifier)
+          (expression
+            (map_literal
+              (map_entries
+                (map_entry
+                  (identifier)
+                  (expression
+                    (identifier)))
+                (map_entry
+                  (identifier)
+                  (expression
+                    (identifier)))))))))))
+

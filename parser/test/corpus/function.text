@@ -1,0 +1,31 @@
+======================
+Simple Function
+======================
+
+function name(parameters: Type[]) -> return_type {
+    client llm_specification
+    prompt block_string_specification
+}
+
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameters
+          (parameter
+            (identifier)
+            (type
+              (array_type
+                (identifier))))))
+          (type
+            (identifier))
+          (function_body
+            (llm
+              (identifier))
+            (prompt
+              (identifier))))))
+
+
