@@ -3,11 +3,9 @@ local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.baml = {
     install_info = {
         url = "https://github.com/klepp0/nvim-baml-syntax",
-        files = { "parser/src/parser.c" },
-        -- optional entries:
-        branch = "main",
-        generate_requires_npm = false,          -- if stand-alone parser without npm dependencies
-        requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
+        files = { "parser/baml.so" },
+        generate_requires_npm = false,
+        requires_generate_from_grammar = false,
     },
     filetype = "baml",
 }
