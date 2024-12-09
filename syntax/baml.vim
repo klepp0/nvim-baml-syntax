@@ -2,12 +2,12 @@
 syntax clear
 
 " 1) Keywords & Mappings (lowest priority)
-syntax keyword bamlKeyword function class enum test generator retry_policy template_string client<llm>
+syntax keyword bamlKeyword function class enum test generator retry_policy template_string /\<client<llm>\>/
 highlight link bamlKeyword Keyword
 
 " Environment variables
 syntax region bamlEnvVariable start='env.' end='[a-zA-Z0-9_]*'
-highlight link bamlEnvVariable Special
+highlight link bamlEnvVariable Constant
 
 " 2) Strings (second priority)
 " Normal strings
