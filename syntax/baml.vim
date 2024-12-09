@@ -3,7 +3,7 @@ syntax clear
 
 " 1) Keywords & Mappings (lowest priority)
 syntax keyword bamlKeyword function class enum test generator retry_policy template_string
-syntax match bamlKeyword /\<client<llm>\>/
+syntax match bamlKeyword /\<client\<llm\>\>/
 highlight link bamlKeyword Keyword
 
 " Environment variables
