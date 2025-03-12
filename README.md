@@ -16,22 +16,13 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 
    ```lua
    {
-   "klepp0/nvim-baml-syntax",
-   dependencies = {
-   "nvim-treesitter/nvim-treesitter"
-   },
-   config = function()
-   -- Optionally load Lua config if you have one:
-   -- require("baml_syntax")
-
-       require("nvim-treesitter.configs").setup({
-         ensure_installed = { "baml" },
-         highlight = {
-           enable = true,
-         },
-       })
-
-   end,
+     "klepp0/nvim-baml-syntax",
+     dependencies = { "nvim-treesitter/nvim-treesitter" },
+     config = function()
+       -- This ensures lua/baml_syntax/init.lua is run,
+       -- which registers the "baml" parser and configures Tree-sitter:
+       require("baml_syntax")
+     end,
    }
    ```
 
@@ -47,16 +38,8 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
      "klepp0/nvim-baml-syntax",
      requires = { "nvim-treesitter/nvim-treesitter" },
      config = function()
-       -- Optionally load Lua config if you have one:
-       -- require("baml_syntax")
-
-       require("nvim-treesitter.configs").setup({
-         ensure_installed = { "baml" },
-         highlight = {
-           enable = true,
-         },
-       })
-     end
+       require("baml_syntax")
+     end,
    }
    ```
 
@@ -69,8 +52,8 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 
    ```vim
    call plug#begin('~/.local/share/nvim/plugged')
-   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-   Plug 'klepp0/nvim-baml-syntax'
+     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+     Plug 'klepp0/nvim-baml-syntax'
    call plug#end()
    ```
 
@@ -79,36 +62,11 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 
    ```vim
    lua << EOF
-   require'nvim-treesitter.configs'.setup {
-   ensure_installed = {"baml"},
-   highlight = {
-   enable = true,
-   additional_vim_regex_highlighting = false,
-   },
-   }
+   require("baml_syntax")
    EOF
    ```
 
 4. Open a `.baml` file and ensure the syntax highlighting is active.
-
-> [!NOTE]
-> If you have manually set up filetype detection and syntax highlighting files (`ftdetect/baml.vim`, `syntax/baml.vim`, etc.), they will be included and applied automatically once the plugin is installed. If you have a Lua configuration file (e.g., `lua/baml_syntax/init.lua`) for additional customization, uncomment the `require("baml_syntax")` line in the plugin configuration section.
-
-### Tree-sitter Integration (Optional)
-
-To enable Tree-sitter:
-
-1. Ensure you have [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) installed.
-2. Install the Tree-sitter parser:
-   ```lua
-   require'nvim-treesitter.configs'.setup {
-     ensure_installed = {"baml"},
-     highlight = {
-       enable = true,
-       additional_vim_regex_highlighting = false,
-     },
-   }
-   ```
 
 ## Usage
 
