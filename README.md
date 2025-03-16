@@ -7,6 +7,7 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 - Traditional Vim syntax highlighting.
 - Optional Tree-sitter integration for advanced highlighting.
 - Filetype detection and indentation settings.
+- Optional automatic formatting of BAML files on save using `baml-cli`.
 
 ## Installation
 
@@ -21,7 +22,7 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
      config = function()
        -- This ensures lua/baml_syntax/init.lua is run,
        -- which registers the "baml" parser and configures Tree-sitter:
-       require("baml_syntax")
+       require("baml_syntax").setup()
      end,
    }
    ```
@@ -38,7 +39,7 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
      "klepp0/nvim-baml-syntax",
      requires = { "nvim-treesitter/nvim-treesitter" },
      config = function()
-       require("baml_syntax")
+       require("baml_syntax").setup()
      end,
    }
    ```
@@ -62,7 +63,7 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 
    ```vim
    lua << EOF
-   require("baml_syntax")
+   require("baml_syntax").setup()
    EOF
    ```
 
@@ -71,6 +72,23 @@ A Neovim plugin to provide syntax highlighting for `.baml` files.
 ## Usage
 
 Open any `.baml` file in Neovim to see syntax highlighting in action.
+
+### Formatting on save
+
+You can have BAML files get formatted on save by calling passing
+`format_on_save = true` to the `require("baml_syntax").setup()` call when you
+initialize the plugin. For example:
+
+```lua
+require("baml_syntax").setup({
+  format_on_save = true,  -- Set to true to enable formatting on save
+  baml_cli_path = "/path/to/baml-cli",  -- Optional path to baml-cli executable if it's not on PATH
+})
+```
+
+#### Commands
+
+- `:BamlFormat` - Format the current BAML file
 
 ## Contributing
 
