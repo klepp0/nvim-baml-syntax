@@ -4,43 +4,71 @@ local M = {}
 -- Default configuration
 M.config = {
     format_on_save = false,
-    format_command = "baml-cli fmt",
+    baml_cli_path = "baml-cli", -- Default assumes baml-cli is on PATH
 }
 
 -- Function to format BAML file
 function M.format_baml(file_path)
     file_path = file_path or vim.fn.expand('%:p')
     
-    -- Create temporary file for output
-    local tmp_file = vim.fn.tempname()
+    -- Create temporary files for output and error
+    local tmp_output = vim.fn.tempname()
+    local tmp_error = vim.fn.tempname()
     
-    -- Run formatter command
-    local cmd = string.format("%s --dry-run %s > %s", M.config.format_command, vim.fn.shellescape(file_path), tmp_file)
+    -- Run formatter command with -n (dry-run) flag to output to stdout
+    local cmd = string.format("%s fmt -n %s > %s 2> %s", 
+                              M.config.baml_cli_path, 
+                              vim.fn.shellescape(file_path),
+                              tmp_output,
+                              tmp_error)
+    
     local exit_code = os.execute(cmd)
     
+    -- Read error output if there was an error
     if exit_code ~= 0 then
-        vim.api.nvim_err_writeln("Error formatting BAML file")
+        local error_content = ""
+        local error_file = io.open(tmp_error, "r")
+        
+        if error_file then
+            error_content = error_file:read("*all")
+            error_file:close()
+        end
+        
+        -- Display the actual error message
+        if error_content and error_content ~= "" then
+            vim.api.nvim_err_writeln("Error formatting BAML file: " .. error_content)
+        else
+            vim.api.nvim_err_writeln("Error formatting BAML file (exit code: " .. exit_code .. ")")
+        end
+        
+        -- Clean up temporary files
+        os.remove(tmp_output)
+        os.remove(tmp_error)
         return false
     end
     
     -- Read formatted content
     local formatted_content = {}
-    local file = io.open(tmp_file, "r")
-    if file then
-        for line in file:lines() do
+    local output_file = io.open(tmp_output, "r")
+    
+    if output_file then
+        for line in output_file:lines() do
             table.insert(formatted_content, line)
         end
-        file:close()
+        output_file:close()
     else
         vim.api.nvim_err_writeln("Error reading formatted output")
+        os.remove(tmp_output)
+        os.remove(tmp_error)
         return false
     end
     
     -- Update buffer with formatted content
     vim.api.nvim_buf_set_lines(0, 0, -1, false, formatted_content)
     
-    -- Clean up temporary file
-    os.remove(tmp_file)
+    -- Clean up temporary files
+    os.remove(tmp_output)
+    os.remove(tmp_error)
     return true
 end
 
