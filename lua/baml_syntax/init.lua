@@ -11,14 +11,28 @@ M.config = {
 function M.format_baml(file_path)
     file_path = file_path or vim.fn.expand('%:p')
     
-    -- Create temporary files for output and error
+    -- Create temporary files for input, output and error
+    local tmp_input = vim.fn.tempname()
     local tmp_output = vim.fn.tempname()
     local tmp_error = vim.fn.tempname()
     
-    -- Run formatter command with -n (dry-run) flag to output to stdout
+    -- Get current buffer content and write to temporary input file
+    local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local input_file = io.open(tmp_input, "w")
+    if input_file then
+        for _, line in ipairs(buffer_content) do
+            input_file:write(line .. "\n")
+        end
+        input_file:close()
+    else
+        vim.api.nvim_err_writeln("Error creating temporary input file")
+        return false
+    end
+    
+    -- Run baml-cli's format command on the temporary input file in dry run mode
     local cmd = string.format("%s fmt -n %s > %s 2> %s", 
                               M.config.baml_cli_path, 
-                              vim.fn.shellescape(file_path),
+                              vim.fn.shellescape(tmp_input),
                               tmp_output,
                               tmp_error)
     
@@ -42,6 +56,7 @@ function M.format_baml(file_path)
         end
         
         -- Clean up temporary files
+        os.remove(tmp_input)
         os.remove(tmp_output)
         os.remove(tmp_error)
         return false
@@ -58,6 +73,7 @@ function M.format_baml(file_path)
         output_file:close()
     else
         vim.api.nvim_err_writeln("Error reading formatted output")
+        os.remove(tmp_input)
         os.remove(tmp_output)
         os.remove(tmp_error)
         return false
@@ -67,6 +83,7 @@ function M.format_baml(file_path)
     vim.api.nvim_buf_set_lines(0, 0, -1, false, formatted_content)
     
     -- Clean up temporary files
+    os.remove(tmp_input)
     os.remove(tmp_output)
     os.remove(tmp_error)
     return true
