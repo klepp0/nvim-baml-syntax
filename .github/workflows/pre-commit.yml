@@ -1,22 +1,21 @@
-name: Code Quality Check
+name: Pre-Commit Hooks
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+  push:
+    branches: [main]
 
 jobs:
-  format-check:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # --- Lua Section ---
-      - name: Check Lua Format (StyLua)
-        uses: JohnnyMorganz/stylua-action@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # This will check all .lua files and fail if not formatted
-          args: --check .
+          python-version: '3.x'
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
