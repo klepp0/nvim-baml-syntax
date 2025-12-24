@@ -95,27 +95,50 @@ end
 function M.setup(opts)
 	M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 
-	-- Register Tree-sitter parser
-	local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-	parser_config.baml = {
-		install_info = {
-			url = "https://github.com/klepp0/nvim-baml-syntax",
-			files = { "parser/src/parser.c" },
-			branch = "main",
-			generate_requires_npm = false,
-			requires_generate_from_grammar = false,
-		},
-		filetype = "baml",
+	-- Register Tree-sitter parser (modern API)
+	local parser_info = {
+		url = "https://github.com/klepp0/nvim-baml-syntax",
+		files = { "parser/src/parser.c" },
+		branch = "main",
+		generate_requires_npm = false,
+		requires_generate_from_grammar = false,
 	}
 
+	-- Try to configure parser installation settings
+	local ok_install, parser_install = pcall(require, "nvim-treesitter.install")
+	if ok_install then
+		parser_install.prefer_git = true
+	end
+
+	-- Register the language
+	vim.treesitter.language.register("baml", "baml")
+
+	-- Add to parser configs if needed for installation
+	local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+	if ok and parsers.get_parser_configs and type(parsers.get_parser_configs) == "function" then
+		-- Older treesitter version - use deprecated API
+		local parser_configs = parsers.get_parser_configs()
+		parser_configs.baml = {
+			install_info = parser_info,
+			filetype = "baml",
+		}
+	else
+		-- Newer treesitter - manual installation setup
+		local install_dir = vim.fn.stdpath("data") .. "/nvim-treesitter"
+		vim.opt.runtimepath:append(install_dir)
+	end
+
 	-- Configure Tree-sitter
-	require("nvim-treesitter.configs").setup({
-		ensure_installed = { "baml" },
-		highlight = {
-			enable = true,
-			additional_vim_regex_highlighting = false,
-		},
-	})
+	local ok_config, ts_configs = pcall(require, "nvim-treesitter.configs")
+	if ok_config then
+		ts_configs.setup({
+			ensure_installed = { "baml" },
+			highlight = {
+				enable = true,
+				additional_vim_regex_highlighting = false,
+			},
+		})
+	end
 
 	-- Add autocmd for format on save
 	if M.config.format_on_save then
