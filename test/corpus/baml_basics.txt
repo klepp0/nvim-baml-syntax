@@ -1,0 +1,152 @@
+==================
+Basic Class Declaration
+==================
+
+class MyClass {}
+
+---
+(source_file (declaration (class_declaration name: (identifier) body: (class_body))))
+
+==================
+Enum Declaration
+==================
+
+enum Status {
+  PENDING
+  DONE @@value("completed")
+}
+
+---
+(source_file (declaration (enum_declaration name: (identifier) body: (enum_body (enum_value name: (identifier)) (enum_value name: (identifier)) (class_attribute name: (identifier) (attribute_arguments (attribute_argument (string))))))))
+
+==================
+Simple Class Field
+==================
+
+class Person {
+  name string
+}
+
+---
+(source_file (declaration (class_declaration name: (identifier) body: (class_body (class_field name: (identifier) type: (type (primitive_type)))))))
+
+
+==================
+Class Field with Optional Type
+==================
+
+class Person {
+  age int?
+}
+
+---
+(source_file (declaration (class_declaration name: (identifier) body: (class_body (class_field name: (identifier) type: (type (primitive_type)))))))
+
+
+==================
+Class Field with Array Type
+==================
+
+class Person {
+  tags string[]
+}
+
+---
+(source_file (declaration (class_declaration name: (identifier) body: (class_body (class_field name: (identifier) type: (type (array_type element: (type (primitive_type)))))))))
+
+
+==================
+Environment Variable (Currently Failing Top-Level)
+==================
+
+env.MY_KEY
+
+---
+(source_file (environment_variable name: (identifier)))
+
+
+==================
+Simple Function
+==================
+
+function MyFunc() {}
+
+---
+(source_file (declaration (function_declaration name: (identifier) parameters: (parameter_list) body: (function_body))))
+
+==================
+Function with Client Block (String Ref)
+==================
+
+function X() {
+  client "openai/gpt-4o-mini"
+}
+
+---
+(source_file (declaration (function_declaration name: (identifier) parameters: (parameter_list) body: (function_body (llm_client_block client_ref: (string))))))
+
+
+==================
+Function with Prompt Block
+==================
+
+function Y() {
+  prompt #"Hello"#
+}
+
+---
+(source_file (declaration (function_declaration name: (identifier) parameters: (parameter_list) body: (function_body (prompt_block content: (block_string))))))
+
+
+==================
+Simple Map Literal
+==================
+
+{ key: "value" }
+
+---
+(source_file (expression (map_literal (map_entry key: (identifier) value: (expression (string))))))
+
+
+==================
+Map with Env Var (Inside Client Decl - Assuming map parsing issue)
+==================
+
+client<llm> C {
+  api_key: env.KEY
+}
+
+---
+(source_file (declaration (client_declaration type: (identifier) name: (identifier) body: (map_literal (map_entry key: (identifier) value: (expression (environment_variable name: (identifier))))))))
+
+
+==================
+Simple Interpolation
+==================
+
+#"{{ name }}"#
+
+---
+(source_file (expression (block_string (interpolation (expression (identifier))))))
+
+
+==================
+Member Access Interpolation
+==================
+
+#"{{ user.name }}"#
+
+---
+(source_file (expression (block_string (interpolation (expression (member_expression object: (expression (identifier)) property: (identifier)))))))
+
+
+==================
+Test Declaration (Basic)
+==================
+
+test MyTest {
+  functions: [Describe]
+}
+
+---
+(source_file (declaration (test_declaration name: (identifier) body: (test_body (test_statement key: (test_keyword) value: (expression (array_literal (expression (identifier)))))))))

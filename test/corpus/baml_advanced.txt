@@ -1,0 +1,30 @@
+==================
+Class with Attributes and Interpolation
+==================
+
+class Person {
+    /// A docstring for the 'Person' class
+    name string @alias("full_name") @description("The person's full name")
+    age int? @check(adult, {{ this >= 18 }}) @description("Age of the person, optional")
+    tags string[] @assert(has_tags, {{ this }}) 
+    @@dynamic
+}
+
+---
+(source_file
+  (declaration
+    (class_declaration name: (identifier) body: (class_body
+      (docstring)
+      (class_field name: (identifier) type: (type (primitive_type))
+        (field_attribute name: (identifier) (attribute_arguments (attribute_argument (string))))
+        (field_attribute name: (identifier) (attribute_arguments (attribute_argument (string)))))
+      (class_field name: (identifier) type: (type (primitive_type))
+        (field_attribute name: (identifier) (attribute_arguments
+          (attribute_argument (identifier))
+          (attribute_argument (interpolation (expression (binary_expression left: (expression (identifier)) operator: (binary_operator) right: (expression (number))))))))
+        (field_attribute name: (identifier) (attribute_arguments (attribute_argument (string)))))
+      (class_field name: (identifier) type: (type (array_type element: (type (primitive_type))))
+        (field_attribute name: (identifier) (attribute_arguments
+          (attribute_argument (identifier))
+          (attribute_argument (interpolation (expression (identifier)))))))
+      (class_attribute name: (identifier))))))

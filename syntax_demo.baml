@@ -7,7 +7,7 @@
 /// This is a docstring comment for a class below
 
 // Environment variable usage
-env.MY_SECRET_KEY
+env.MY_SECRET_KEY // with a comment
 
 // Primitive Types & Multimodal
 // bool, int, float, string, null, image, audio, model
