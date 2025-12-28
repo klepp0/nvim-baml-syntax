@@ -27,5 +27,3 @@ function name(parameters: Type[]) -> return_type {
               (identifier))
             (prompt
               (identifier))))))
-
-

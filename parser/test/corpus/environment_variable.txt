@@ -12,4 +12,3 @@ env.MY_SECRET_KEY
     (expression
         (environment_variable
             (identifier))))
-
