@@ -1,4 +1,4 @@
-;; queries/baml/highlighter.scm
+;; queries/baml/highlights.scm
 
 ;; =============================================================================
 ;; BAML Syntax Highlighting Definitions
@@ -11,34 +11,38 @@
 (docstring) @comment
 
 ;; ---------------------------
-;; Keywords (Declarations)
+;; Keywords (Declaration tokens only)
 ;; ---------------------------
-(function_declaration) @keyword
-(class_declaration) @keyword
-(enum_declaration) @keyword
-(test_declaration) @keyword
-(generator_declaration) @keyword
-(retry_policy_declaration) @keyword
-(template_string_declaration) @keyword
+(function_declaration "function" @keyword)
+(class_declaration "class" @keyword)
+(enum_declaration "enum" @keyword)
+(test_declaration "test" @keyword)
+(client_declaration "client<llm>" @keyword)
+(retry_policy_declaration "retry_policy" @keyword)
+(template_string_declaration "template_string" @keyword)
 
 ;; ---------------------------
 ;; Function and Type Names
 ;; ---------------------------
-(function_declaration name: (identifier)) @function
+(function_declaration name: (identifier) @function)
 
-(class_declaration name: (identifier)) @type
-(enum_declaration name: (identifier)) @type
-(test_declaration name: (identifier)) @type
-(generator_declaration name: (identifier)) @type
-(retry_policy_declaration name: (identifier)) @type
-(template_string_declaration name: (identifier)) @type
+(class_declaration name: (identifier) @type)
+(enum_declaration name: (identifier) @type)
+(test_declaration name: (identifier) @type)
+(client_declaration name: (identifier) @type)
+(retry_policy_declaration name: (identifier) @type)
+(template_string_declaration name: (identifier) @type)
 
 ;; ---------------------------
 ;; Parameters and Types
 ;; ---------------------------
-(parameter) @parameter
+(parameter (identifier) @variable.parameter)
+(parameter (type) @type)
 
 (type) @type
+(union_type) @type
+(primitive_type) @type
+(array_type) @type
 
 ;; ---------------------------
 ;; Strings and Numbers
@@ -51,32 +55,19 @@
 ;; ---------------------------
 ;; Operators
 ;; ---------------------------
-(_arrow) @operator
+"->" @operator
 
 ;; ---------------------------
-;; Environment Variables and Identifiers
+;; Environment Variables
 ;; ---------------------------
-(environment_variable name: (identifier)) @variable.builtin
-
-(identifier) @identifier
-
-;; ---------------------------
-;; Expressions and Structures
-;; ---------------------------
-(function_body) @function
-(union_type) @type
-(primitive_type) @type
-(array_type) @type
-(map_literal) @structure
-(map_entry) @structure
+(environment_variable "env." @variable.builtin)
+(environment_variable name: (identifier) @variable.builtin)
 
 ;; ---------------------------
-;; Additional Highlighting
+;; Map Properties
 ;; ---------------------------
-(map_entry name: (identifier)) @property
-(block) @block
+(map_entry (identifier) @property)
 
 ;; =============================================================================
 ;; End of BAML Syntax Highlighting Definitions
 ;; =============================================================================
-
